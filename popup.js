@@ -110,6 +110,7 @@ startBtn.addEventListener('click', async () => {
       startBtn.innerHTML = '<span class="icon">⏺️</span> Iniciar Gravação';
       
       if (response && response.success) {
+        seconds = 0; // Resetar contador apenas ao iniciar nova gravação
         updateUIToRecording();
         // Atualiza status das fontes
         document.getElementById('micStatus').textContent = 'Capturando áudio ✓';
@@ -154,7 +155,7 @@ stopBtn.addEventListener('click', () => {
 // Atualizar UI para estado de gravação
 function updateUIToRecording() {
   recording = true;
-  seconds = 0;
+  // NÃO resetar seconds aqui - pode estar sendo restaurado com valor correto
   startBtn.style.display = 'none';
   stopBtn.style.display = 'flex';
   recordingStatus.classList.add('active', 'recording');
