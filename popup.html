@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Recorder</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            width: 400px;
+            min-height: 500px;
+        }
+
+        .container {
+            background: white;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .header p {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f7f7f7;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 13px;
+            color: #666;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab:hover {
+            background: #ebebeb;
+        }
+
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            background: white;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: #333;
+            font-size: 13px;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 13px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .audio-source {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+        }
+
+        .audio-source:hover {
+            border-color: #667eea;
+            background: #f9f9ff;
+        }
+
+        .audio-indicator {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.3s;
+        }
+
+        .audio-indicator.active {
+            background: #4ade80;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .audio-info {
+            flex: 1;
+        }
+
+        .audio-info h3 {
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 2px;
+        }
+
+        .audio-info p {
+            font-size: 11px;
+            color: #666;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+            margin-top: 10px;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .recording-status {
+            text-align: center;
+            padding: 12px;
+            background: #fef2f2;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            display: none;
+        }
+
+        .recording-status.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        .recording-status.recording {
+            background: #fee2e2;
+        }
+
+        .recording-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background: #ef4444;
+            border-radius: 50%;
+            margin-right: 6px;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .status-text {
+            font-weight: 600;
+            font-size: 13px;
+            color: #991b1b;
+        }
+
+        .help-text {
+            font-size: 11px;
+            color: #666;
+            margin-top: 4px;
+            font-style: italic;
+        }
+
+        .icon {
+            font-size: 16px;
+        }
+
+        .save-indicator {
+            display: inline-block;
+            padding: 8px 14px;
+            background: #d1fae5;
+            color: #065f46;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .save-indicator.show {
+            display: inline-block;
+            animation: fadeIn 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎙️ Task Recorder</h1>
+            <p>Grave áudio e crie tarefas automaticamente</p>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active" data-tab="action">Gravação</div>
+            <div class="tab" data-tab="settings">Configurações</div>
+        </div>
+
+        <div class="content">
+            <!-- ACTION TAB -->
+            <div class="tab-content active" id="action">
+                <div class="form-group">
+                    <label>Nome da Gravação</label>
+                    <input type="text" id="recordingName" placeholder="Ex: Reunião de planejamento semanal">
+                    <p class="help-text">Dê um nome descritivo para organizar suas gravações</p>
+                </div>
+
+                <div class="form-group">
+                    <label>Fontes de Áudio</label>
+                    
+                    <div class="audio-source" id="microphoneSource">
+                        <div class="audio-indicator" id="micIndicator">🎤</div>
+                        <div class="audio-info">
+                            <h3>Microfone</h3>
+                            <p id="micStatus">Aguardando permissão...</p>
+                        </div>
+                    </div>
+
+                    <div class="audio-source" id="tabSource">
+                        <div class="audio-indicator" id="tabIndicator">🔊</div>
+                        <div class="audio-info">
+                            <h3>Áudio da Aba</h3>
+                            <p id="tabStatus">Aguardando permissão...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="recording-status" id="recordingStatus">
+                    <span class="recording-dot"></span>
+                    <span class="status-text">GRAVANDO - <span id="recordingTime">00:00</span></span>
+                </div>
+
+                <button class="btn btn-primary" id="startBtn">
+                    <span class="icon">⏺️</span>
+                    Iniciar Gravação
+                </button>
+
+                <button class="btn btn-danger" id="stopBtn" style="display: none;">
+                    <span class="icon">⏹️</span>
+                    Finalizar Gravação
+                </button>
+            </div>
+
+            <!-- SETTINGS TAB -->
+            <div class="tab-content" id="settings">
+                <div class="form-group">
+                    <label>OpenAI API Key</label>
+                    <input type="password" id="openaiKey" placeholder="sk-...">
+                    <p class="help-text">Para transcrição (Whisper) e extração (GPT-4)</p>
+                </div>
+
+                <div class="form-group">
+                    <label>Discord Webhook - Atas</label>
+                    <input type="password" id="discordWebhookMinutes" placeholder="https://discord.com/api/webhooks/...">
+                    <p class="help-text">Webhook para enviar atas das reuniões</p>
+                </div>
+
+                <div class="form-group">
+                    <label>Discord Webhook - Tarefas</label>
+                    <input type="password" id="discordWebhookTasks" placeholder="https://discord.com/api/webhooks/...">
+                    <p class="help-text">Webhook para enviar tarefas extraídas</p>
+                </div>
+
+                <button class="btn btn-success" id="saveSettings">
+                    <span class="icon">💾</span>
+                    Salvar Configurações
+                </button>
+
+                <span class="save-indicator" id="saveIndicator">✓ Configurações salvas!</span>
+
+                <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
+                    <button class="btn" id="resetState" style="background: #ef4444; color: white; font-size: 12px; padding: 8px;">
+                        <span class="icon">🔄</span>
+                        Resetar Estado (Emergência)
+                    </button>
+                    <p class="help-text">Use apenas se a gravação travar</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>
