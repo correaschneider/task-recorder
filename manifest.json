@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Task Recorder",
   "version": "1.0.0",
-  "description": "Grave áudio de reuniões e crie tarefas automaticamente no Trello",
+  "description": "Grave áudio de reuniões, transcreva automaticamente e extraia tarefas com IA. Gera atas detalhadas e envia para Discord.",
   "permissions": [
     "storage",
     "activeTab",
